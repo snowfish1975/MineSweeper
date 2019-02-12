@@ -4,21 +4,26 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-import java.util.Arrays;
+
 
 public class Main extends Application {
 
     String[] colors = {"GREY","BROWN", "GREEN", "BLUE", "YELLOW", "PURPLE", "MAGENTA", "CYAN", "BLACK", "BLACK","RED"};
 
+    private static Label minesCleared;
+    private static Label minesStill;
+
     private static final int fieldSize = 10;
-    private static final int mineCount = 15;
+    private static int mineCount = 15;
     private static int[][] gameFieldValues = new int[fieldSize][fieldSize];
 
     @Override
@@ -46,8 +51,11 @@ public class Main extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
+        minesStill = (Label) scene.lookup("#minesstill");
+        minesStill.setText(""+mineCount);
         GridPane gameField = (GridPane) scene.lookup("#GameField");
-        Label[][] labels = new Label[10][10];
+        Label[][] labels = new Label[fieldSize][fieldSize];
+        Button[][] buttons = new Button[fieldSize][fieldSize];
         int fieldSize = 10;
         String s;
         for (int i = 0; i < fieldSize; i++) {
@@ -64,6 +72,41 @@ public class Main extends Application {
                 labels[i][j].setTextFill(Paint.valueOf(colors[gameFieldValues[i][j]]));
                 labels[i][j].setFont(Font.font("System", FontWeight.BOLD, 24));
                 gameField.add(labels[i][j],i,j);
+
+                buttons[i][j] = new Button("");
+                buttons[i][j].setPrefHeight(40);
+                buttons[i][j].setPrefWidth(40);
+                buttons[i][j].setAlignment(Pos.CENTER);
+                buttons[i][j].setId("X"+i+"Y"+j);
+
+                buttons[i][j].setOnMouseClicked(e -> {
+                    Button eventButton = (Button) e.getSource();
+                    switch (e.getButton()){
+                        case PRIMARY: {
+                            eventButton.setVisible(false);
+                            eventButton.setText(eventButton.getId());
+                            int x,y;
+                            break;
+                        }
+                        case SECONDARY: {
+                            if (eventButton.getText().equals("X")){
+                                eventButton.setText("");
+                                mineCount++;
+                                minesStill.setText(""+mineCount);
+                            }
+                            else {
+                                eventButton.setText("X");
+                                eventButton.setFont(Font.font("System", FontWeight.BOLD, 24));
+                                mineCount--;
+                                minesStill.setText("" + mineCount);
+                            }
+                            break;
+                        }
+                    }
+                });
+                gameField.add(buttons[i][j],i,j);
+
+
             }
         }
     }
