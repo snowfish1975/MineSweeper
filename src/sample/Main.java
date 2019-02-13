@@ -1,5 +1,7 @@
 package sample;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -15,33 +17,45 @@ import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import javafx.util.Duration;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 
 public class Main extends Application {
 
     private static String[] colors = {"GREY","BROWN", "GREEN", "BLUE", "YELLOW", "PURPLE", "MAGENTA", "CYAN", "BLACK", "BLACK","RED"};
-
-    private static String s;
-
-    private static Label minesCleared;
     private static Label minesStill;
+    private static Label timeElapsed;
+    public static final int timerDelay = 1000;
+
+    public static String timerString;
+
+    private static int mins = 0;
+    private static int secs = 0;
 
     private static final int fieldSize = 10;
     private static final int cellSize = 40;
-    private static int mineCount = 15;
+    public static int mineCount = 15;
+    public static Scene scene;
     private static int[][] gameFieldValues = new int[fieldSize][fieldSize];
 
     private static Label[][] labels = new Label[fieldSize][fieldSize];     // array of labels-digits on the game field
     private static Button[][] buttons = new Button[fieldSize][fieldSize];  // array of buttons covering cells and waiting for clicks
+    private static int timeCount = 0;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
 
+        SplitPane root = FXMLLoader.load(getClass().getResource("sample.fxml"));
+        scene = new Scene(root);
+
         fillGameField(); // fills game arrays with random "mines" and count numbers
 
         // generates main game window
-        SplitPane root = FXMLLoader.load(getClass().getResource("sample.fxml"));
         primaryStage.setTitle("Mine Sweeper");
-        Scene scene = new Scene(root);
         primaryStage.setScene(scene);
         primaryStage.show();
 
@@ -77,16 +91,15 @@ public class Main extends Application {
                             if (eventButton.getText().equals("X")){
                                 eventButton.setText("");
                                 eventButton.setStyle(eventButton.getId().substring(eventButton.getId().indexOf("STYLE")+5));
+                                eventButton.setGraphic(new ImageView());
                                 mineCount++;
-                                minesStill.setText(""+mineCount);
                             }
                             else {
                                 eventButton.setText("X");
                                 eventButton.setGraphic(new ImageView(image));
-                                eventButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
                                 mineCount--;
-                                minesStill.setText("" + mineCount);
                             }
+                            minesStill.setText("" + mineCount);
                             break;
                         }
                     }
@@ -94,6 +107,19 @@ public class Main extends Application {
                 gameField.add(buttons[i][j],i,j);
             }
         }
+        Timeline timeline = new Timeline(
+                new KeyFrame(Duration.seconds(1), ae -> {
+                    timeCount++;
+                    timeElapsed = (Label) scene.lookup("#timeelapsed");
+                    mins = timeCount / 60;
+                    secs = timeCount % 60;
+                    timerString = String.format("%02d:%02d",mins, secs);
+                    timeElapsed.setText(""+timerString);
+                    System.out.println(timerString);
+                })
+        );
+        timeline.setCycleCount(-1);
+        timeline.play();
     }
 
     static void fillGameField() {
@@ -125,6 +151,10 @@ public class Main extends Application {
     }
 
     static void restoreGameFieldView(){
+        minesStill.setText("" + mineCount);
+        timeCount = 0;
+        timeElapsed = (Label) scene.lookup("#timeelapsed");
+        timeElapsed.setText("00:00");
         for (int i = 0; i < fieldSize; i++)
             for (int j = 0; j < fieldSize; j++) {
                 defineLabel(i,j);
@@ -133,11 +163,12 @@ public class Main extends Application {
     }
 
     private static void defineLabel(int i, int j){
+        labels[i][j].setStyle("-fx-background-color: transparent");
         String s;
         switch (gameFieldValues[i][j]){
-            case 0: { s=""; break; }
-            case 10: { s="@"; labels[i][j].setStyle("-fx-background-color: #ffbbbb"); break; }
-            default: s=""+gameFieldValues[i][j];
+            case 0: { s =""; break; }
+            case 10: { s ="@"; labels[i][j].setStyle("-fx-background-color: #ffbbbb"); break; }
+            default: s =""+gameFieldValues[i][j];
         }
         labels[i][j].setText(s);
         labels[i][j].setTextFill(Paint.valueOf(colors[gameFieldValues[i][j]]));
@@ -158,6 +189,9 @@ public class Main extends Application {
         buttons[i][j].setAlignment(Pos.CENTER);
         buttons[i][j].setStyle("-fx-base: #aaaaaa");
         buttons[i][j].setId("X"+i+"Y"+j+"STYLE"+buttons[i][j].getStyle());
+        buttons[i][j].setGraphic(new ImageView());
+        buttons[i][j].setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        buttons[i][j].setFocusTraversable(false);
         buttons[i][j].setVisible(true);
     }
 

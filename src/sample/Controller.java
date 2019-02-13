@@ -14,8 +14,10 @@ public class Controller {
 
     @FXML
     private void restartGame(ActionEvent e){
+        Main.mineCount = 15;
         Main.fillGameField();
         Main.restoreGameFieldView();
+
     }
 
     public Controller(){
