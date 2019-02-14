@@ -79,7 +79,7 @@
             </GridPane>
             <Label id="died" alignment="CENTER" prefHeight="118.0" prefWidth="166.0" text="YOU DIED" textFill="RED" visible="false" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="150.0">
                <font>
-                  <Font name="Agency FB Bold" size="96.0" />
+                  <Font name="Agency FB" size="96.0" />
                </font>
                <effect>
                   <DropShadow />
@@ -87,7 +87,7 @@
             </Label>
             <Label id="won" alignment="CENTER" layoutX="10.0" layoutY="160.0" prefHeight="118.0" prefWidth="166.0" text="YOU WON!!!" textFill="#00ff09" visible="false" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="100.0">
                <font>
-                  <Font name="Agency FB Bold" size="96.0" />
+                  <Font name="Agency FB" size="96.0" />
                </font>
                <effect>
                   <DropShadow blurType="ONE_PASS_BOX" height="75.0" radius="37.0" spread="0.5" width="75.0" />
@@ -95,7 +95,7 @@
             </Label>
             <Label id="newbesttime" alignment="CENTER" layoutX="10.0" layoutY="110.0" prefHeight="118.0" prefWidth="166.0" text="NEW BEST TIME!" textFill="#00ff09" visible="false" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="200.0">
                <font>
-                  <Font name="Agency FB Bold" size="60.0" />
+                  <Font name="Agency FB" size="64.0" />
                </font>
                <effect>
                   <DropShadow blurType="ONE_PASS_BOX" height="75.0" radius="37.0" spread="0.5" width="75.0" />
