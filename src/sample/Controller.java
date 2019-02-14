@@ -17,7 +17,6 @@ public class Controller {
         Main.mineCount = 15;
         Main.fillGameField();
         Main.restoreGameFieldView();
-
     }
 
     public Controller(){
