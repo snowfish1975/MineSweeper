@@ -29,13 +29,13 @@ public class Main extends Application {
     private static final int cellSize = 40;   // размер каждой клетки в пикселях
     public static int mineCount = 15;   // оставшееся количество мин на поле
     public static int spareCount = fieldSize * fieldSize - mineCount; // оставшееся количество свободных клеток на поле
-    public static Scene scene;
+    public static Scene scene;  // основная сцена игры, на которой будут располагаться все компоненты интерфейса
     private static int[][] gameFieldValues = new int[fieldSize][fieldSize]; // массив значений клеток поля. 10 - мина, остальное - количество рядом стоящих мин
     private static Label[][] labels = new Label[fieldSize][fieldSize];     // массив текстовых меток для обозначения количества мин рядом
     private static Button[][] buttons = new Button[fieldSize][fieldSize];  // массив кнопок, закрывающих текстовые метки
     private static int[][] emptySpaceMask = new int[fieldSize][fieldSize]; // временный массив для расчта свободной площади игрового поля
-    private static int timeCount = 0;
-    private static int bestTimeCount = -1;
+    private static int timeCount = 0; // счетчик времени, прошедшего с начала игры
+    private static int bestTimeCount = -1; // переменная для хранения лучшего времени
 
     private static Timeline timeline;
 
@@ -47,13 +47,13 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        flagImage = new Image(getClass().getResourceAsStream("flag.png"));
-        noMineImage = new Image(getClass().getResourceAsStream("nomine.png"));
-        rightMineImage = new Image(getClass().getResourceAsStream("yesmine.png"));
-        emptyImage = new ImageView();
+        flagImage = new Image(getClass().getResourceAsStream("flag.png"));          // создание объекта "Картинка" и загрузка в него изображения из png-файла
+        noMineImage = new Image(getClass().getResourceAsStream("nomine.png"));      // создание объекта "Картинка" и загрузка в него изображения из png-файла
+        rightMineImage = new Image(getClass().getResourceAsStream("yesmine.png"));  // создание объекта "Картинка" и загрузка в него изображения из png-файла
+        emptyImage = new ImageView();   // создание пустой картинки для кнопки, чтобы убрать установленные пометки
 
-        SplitPane root = FXMLLoader.load(getClass().getResource("sample.fxml"));
-        scene = new Scene(root);
+        SplitPane root = FXMLLoader.load(getClass().getResource("sample.fxml"));    // загрузка из FXML-файла созданного окна со статичным интерфейсом игры
+        scene = new Scene(root);   // создание основной сцены игры на основе загруженного интерфейса
 
         fillGameField(); // заполняет массив значений метками "мин" или количеством рядом стоящих
 
@@ -88,24 +88,24 @@ public class Main extends Application {
                             eventButton.setText(eventButton.getId());      // позиция кнопки на игровом поле сохранена в ее ID (X...Y...). Читаем позицию
                             int x = Integer.parseInt(eventButton.getId().substring(eventButton.getId().indexOf("X") + 1, eventButton.getId().indexOf("Y")));
                             int y = Integer.parseInt(eventButton.getId().substring(eventButton.getId().indexOf("Y") + 1, eventButton.getId().indexOf("STYLE")));
-                            spareCount--;
-                            if (spareCount == 0 || gameFieldValues[x][y] == 10) gameEnd();
-                            if (gameFieldValues[x][y] == 0) clearEmptySpace(x, y);
+                            spareCount--; // меньшаем количество безопасных клеток, которые осталось открыть
+                            if (spareCount == 0 || gameFieldValues[x][y] == 10) gameEnd(); // если открыта последняя свободная от мин клетка или наступили на мину
+                            if (gameFieldValues[x][y] == 0) clearEmptySpace(x, y);  // если наступили на свободную от чисел и мин площадь, очистить ее всю
                             break;
                         }
                         case SECONDARY: {  // если нажата правая кнопка мыши
                             if (eventButton.getText().equals("X")) { // если кнопка уже помечена флажком...
-                                eventButton.setText("");
+                                eventButton.setText("");             // снять признак помеченности
                                 eventButton.setStyle(eventButton.getId().substring(eventButton.getId().indexOf("STYLE") + 5));
-                                eventButton.setGraphic(emptyImage);
-                                mineCount++;
+                                eventButton.setGraphic(emptyImage);  // убрать картинку флажка
+                                mineCount++;                         // вернуть в счётчик 1 мину, которую необходимо открыть
                             } else {  // если кнопка еще не помечена флажком
-                                eventButton.setText("X");
-                                eventButton.setGraphic(new ImageView(flagImage));
-                                mineCount--;
-                                if (mineCount == 0) gameEnd();
+                                eventButton.setText("X");   // установить признак помеченности
+                                eventButton.setGraphic(new ImageView(flagImage)); // добавить картинку флажка
+                                mineCount--;  // уменьшить счетчик мин, которые необходимо ещё пометить
+                                if (mineCount == 0) gameEnd(); // если мин больше не осталось (помечено количество клеток равное количеству мин)
                             }
-                            minesStill.setText("" + mineCount);
+                            minesStill.setText("" + mineCount); // сообщаем игроку, сколько мин осталось открыть
                             break;
                         }
                     }
@@ -115,17 +115,20 @@ public class Main extends Application {
         }
 
 //      Создаем и запускаем бесконечный таймер с периодичностью вызова 1 раз в секунду для вывода прошедшего времени на экран
+//      Благодаря лямбда-выражению "ae->{}" можно без создания отдельного метода описать что будет происходить при каждой обработке события
         timeline = new Timeline(
                 new KeyFrame(Duration.seconds(1), ae -> {
-                    timeCount++;
-                    timeElapsed = (Label) scene.lookup("#timeelapsed");
-                    timeElapsed.setText("" + String.format("%02d:%02d", timeCount / 60, timeCount % 60));
+                    timeCount++; // при каждом вызове таймера на 1 увеличивается количество прошедших секунд в счетчике
+                    timeElapsed = (Label) scene.lookup("#timeelapsed");  // находим в сцене ярлык, отображающий прошедшее время по заранее присвоенному id
+                    timeElapsed.setText("" + String.format("%02d:%02d", timeCount / 60, timeCount % 60)); // форматируем и выводим время
                 })
         );
-        timeline.setCycleCount(-1);
-        timeline.play();
+        timeline.setCycleCount(-1);  // эмпирически установлено, что -1 запускает таймер не на конечное количество запусков, а навечно
+        timeline.play(); // запуск таймера
     }
 
+    // При попадании на пустую клетку, нужно по принципу разливающейся воды очистить все пустое пространство,
+    // включая прилегающие ячейки с цифрами ("берега" пустого пространства)
     private void clearEmptySpace(int x, int y) {
         for (int i = 0; i < fieldSize; i++)
             for (int j = 0; j < fieldSize; j++)
@@ -150,6 +153,7 @@ public class Main extends Application {
             }
     }
 
+    // при наступлении события, означающего конец игры, нужно проверить, выиграл ли игрок, все ли мины отмечены правильно
     private void gameEnd() {
         // счетчики показывают, что все мины найдены (и/или все пустые клетки открыты). нужно проверить правильность
         timeline.stop();
@@ -176,6 +180,7 @@ public class Main extends Application {
         }
     }
 
+    // расстановка мин по массиву и заполнение прочих ячеек количеством рядом стоящих мин
     static void fillGameField() {
         int mineX, mineY;
 
@@ -204,6 +209,7 @@ public class Main extends Application {
                                 gameFieldValues[i][j]++;
     }
 
+    // визуальное приведение поля к начальному состоянию - все кнопки видны, все маркеры сняты, таймер обнулен
     static void restoreGameFieldView() {
         minesStill.setText("" + mineCount);
         spareCount = fieldSize * fieldSize - mineCount;
@@ -221,6 +227,7 @@ public class Main extends Application {
         timeline.play();
     }
 
+    // установка начальных свойств для тектового ярлыка в каждой ячейке игрового поля
     private static void defineLabel(int i, int j) {
         labels[i][j].setStyle("-fx-background-color: transparent");
         String s;
@@ -247,6 +254,7 @@ public class Main extends Application {
         labels[i][j].setFont(Font.font("System", FontWeight.BOLD, 24));
     }
 
+    // установка начальных свойств для кнопки в каждой ячейке игрового поля
     private static void defineButton(int i, int j) {
         buttons[i][j].setText("");
         buttons[i][j].setPrefHeight(cellSize);
