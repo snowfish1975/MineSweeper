@@ -27,9 +27,9 @@ public class Main extends Application {
 
     private static final int fieldSize = 10;  // размер поля в ширину и в высоту
     private static final int cellSize = 40;   // размер каждой клетки в пикселях
-    public static int mineCount = 15;   // оставшееся количество мин на поле
-    public static int spareCount = fieldSize * fieldSize - mineCount; // оставшееся количество свободных клеток на поле
-    public static Scene scene;  // основная сцена игры, на которой будут располагаться все компоненты интерфейса
+    static int mineCount = 15;   // оставшееся количество мин на поле
+    private static int spareCount = fieldSize * fieldSize - mineCount; // оставшееся количество свободных клеток на поле
+    private static Scene scene;  // основная сцена игры, на которой будут располагаться все компоненты интерфейса
     private static int[][] gameFieldValues = new int[fieldSize][fieldSize]; // массив значений клеток поля. 10 - мина, остальное - количество рядом стоящих мин
     private static Label[][] labels = new Label[fieldSize][fieldSize];     // массив текстовых меток для обозначения количества мин рядом
     private static Button[][] buttons = new Button[fieldSize][fieldSize];  // массив кнопок, закрывающих текстовые метки
